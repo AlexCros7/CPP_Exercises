@@ -63,7 +63,6 @@ bool command_exec(std::istream& input){
     {
         printDictionary(translations);
     }
-
     else if (command == "save")
     {
         auto name = std::string{};
@@ -74,13 +73,22 @@ bool command_exec(std::istream& input){
             file << add_command << "\n";
         }
     }
-
+    else if (command == "load")
+    {
+        auto name = std::string{};
+        input >> name;
+        auto file = std::ifstream(name);
+        while (file.eof())
+        {
+            
+            command_exec(file);
+        }
+    }
     else if (command == "clear")
     {
         translations.clear();
         history.clear();
     }
-
     else if (command == "remove")
     {
         auto word = std::string{};
