@@ -1,4 +1,8 @@
+#pragma once
 #include <string>
+#include <vector>
+#include <optional>
+#include "Plush.hpp"
 
 class PlushStore
 {
@@ -42,18 +46,50 @@ public:
     {
         if (_wealth != 0)
         {
-            _stock += 1;
-            _experience += 1;
-        }
-        if (_wealth - cost < 0)
-        {
-            _wealth = 0;
-            return cost - _wealth + std::max(_experience, _experience * cost / 100);
-        }
-        else
-        {
+            _stock++;
+            _experience++;
             _wealth -= cost;
-            return cost + std::max(_experience, _experience * cost / 100);
+            if (_wealth < 0)
+            {
+                _wealth = 0;
+            }
+        }
+        const auto value = cost + std::max(_experience, _experience * cost / 100);
+        _plushStock.emplace_back(value);
+        return value;
+    }
+    
+    std::optional<Plush> buy(int money)
+    {
+        if (_plushStock.empty())
+        {
+            return std::nullopt;
+        }
+
+        else {
+            auto min = _plushStock[0];
+            auto index = 0;
+            if (_plushStock.size() > 1){
+                for (auto i = 1u; i < _plushStock.size(); i++)
+                {
+                    if (_plushStock[i] < min)
+                    {
+                        min = _plushStock[i];
+                        index = i;
+                    }
+                }
+            }
+            if (money > min)
+            {
+                _stock--;
+                _wealth += min;
+                _plushStock.erase(_plushStock.begin() + index);
+                return std::optional<Plush>{min};
+            }
+            else
+            {
+                return std::nullopt;
+            }
         }
     }
 
@@ -63,4 +99,5 @@ private:
     int _stock = 0;
     int _debt = 0;
     int _experience = 0;
+    std::vector<int> _plushStock;
 };
